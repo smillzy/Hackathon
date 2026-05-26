@@ -32,46 +32,30 @@
 
         static decimal GetTax(decimal income)
         {
+            var taxRates = new List<(decimal Limit, decimal Rate)>
+    {
+        (540000m, 0.05m),
+        (1210000m, 0.12m),
+        (2420000m, 0.20m),
+        (4530000m, 0.30m),
+        (10310000m, 0.40m),
+        (decimal.MaxValue, 0.50m)
+    };
             decimal tax = 0m;
+            decimal previousLimit = 0m;
 
-            if (income <= 540000m)
+            foreach (var item in taxRates)
             {
-                tax = income * 0.05m;
-            }
-            else if (income <= 1210000m)
-            {
-                tax = 540000m * 0.05m
-                    + (income - 540000m) * 0.12m;
-            }
-            else if (income <= 2420000m)
-            {
-                tax = 540000m * 0.05m
-                    + (1210000m - 540000m) * 0.12m
-                    + (income - 1210000m) * 0.20m;
-            }
-            else if (income <= 4530000m)
-            {
-                tax = 540000m * 0.05m
-                    + (1210000m - 540000m) * 0.12m
-                    + (2420000m - 1210000m) * 0.20m
-                    + (income - 2420000m) * 0.30m;
-            }
-            else if (income <= 10310000m)
-            {
-                tax = 540000m * 0.05m
-                    + (1210000m - 540000m) * 0.12m
-                    + (2420000m - 1210000m) * 0.20m
-                    + (4530000m - 2420000m) * 0.30m
-                    + (income - 4530000m) * 0.40m;
-            }
-            else
-            {
-                tax = 540000m * 0.05m
-                    + (1210000m - 540000m) * 0.12m
-                    + (2420000m - 1210000m) * 0.20m
-                    + (4530000m - 2420000m) * 0.30m
-                    + (10310000m - 4530000m) * 0.40m
-                    + (income - 10310000m) * 0.50m;
+                if (income > item.Limit)
+                {
+                    tax += (item.Limit - previousLimit) * item.Rate;
+                    previousLimit = item.Limit;
+                }
+                else
+                {
+                    tax += (income - previousLimit) * item.Rate;
+                    break;
+                }
             }
 
             return tax;
