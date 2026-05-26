@@ -2,6 +2,7 @@
   <Project Path="contentReplacement/contentReplacement.csproj" />
   <Project Path="GuessNum/GuessNum.csproj" />
   <Project Path="LifeNum/LifeNum.csproj" />
+  <Project Path="ProgressiveTaxRates/ProgressiveTaxRates.csproj" />
   <Project Path="QuantityOfIndividualStrings/QuantityOfIndividualStrings.csproj" />
   <Project Path="TemperatureConversion/TemperatureConversion.csproj" />
 </Solution>
