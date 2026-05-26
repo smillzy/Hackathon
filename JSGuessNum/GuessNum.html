@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bootstrap</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap 1.13.1 ICON -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <div class="container game-wrap">
+      <div class="btn-group w-100 mb-4 mt-4" role="group">
+        <button type="button" class="btn btn-outline-secondary fw-bold start">
+          開始
+        </button>
+        <button type="button" class="btn btn-outline-secondary fw-bold restart">
+          放棄重來
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary fw-bold watch-ans"
+        >
+          看答案
+        </button>
+      </div>
+
+      <div class="list-group mb-4">
+        
+      </div>
+
+      <div class="input-group">
+        <span class="input-group-text fw-bold">猜答案</span>
+        <input type="text" class="form-control guess-input" />
+        <button
+          class="btn btn-outline-secondary fw-bold input-group-button"
+          type="button"
+        >
+          猜!
+        </button>
+      </div>
+    </div>
+
+    <template>
+      <div class="list-group-item d-flex align-items-center record-row">
+        <span class="badge badge-ab me-3"></span>
+        <span class="fs-5"></span>
+      </div>
+    </template>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const btnStart = document.querySelector(".start");
+      const btnRestart = document.querySelector(".restart");
+      const btnWatchAns = document.querySelector(".watch-ans");
+
+      const input = document.querySelector(".guess-input");
+      const btnGuess = document.querySelector(".input-group-button");
+
+      const listGroup = document.querySelector(".list-group");
+      const template = document.querySelector("template");
+
+      let answer = "";
+      // 產生4個不重複數字
+      function createAnswer() {
+        const nums = [];
+
+        while (nums.length < 4) {
+          const num = Math.floor(Math.random() * 10).toString();
+
+          if (!nums.includes(num)) {
+            nums.push(num);
+          }
+        }
+
+        return nums.join("");
+      }
+
+      function checkInput(value) {
+        if (value.length !== 4) {
+          alert("請輸入4個數字");
+          return false;
+        }
+
+        if (Number.isNaN(Number(value))) {
+          // 不是數字，回傳 NaN
+          alert("請輸入數字");
+          return false;
+        }
+
+        // const arr = value.split("");
+        // const set = new Set(arr); // Set 去掉重複
+
+        // if (set.size !== 4) {
+        //   alert("數字不能重複");
+        //   return false;
+        // }
+
+        return true;
+      }
+
+      function getAB(guess) {
+        let a = 0;
+        let b = 0;
+
+        for (let i = 0; i < guess.length; i++) {
+          if (guess[i] === answer[i]) {
+            a++;
+          } else if (answer.includes(guess[i])) {
+            b++;
+          }
+        }
+
+        return `${a}A${b}B`;
+      }
+
+      function addRecord(result, guess) {
+        const clone = template.content.cloneNode(true);
+
+        const badge = clone.querySelector(".badge");
+        const text = clone.querySelector(".fs-5");
+
+        badge.textContent = result;
+        text.textContent = guess;
+
+        if (result === "4A0B") {
+          badge.classList.add("text-bg-success");
+        } else {
+          badge.classList.add("text-bg-danger");
+        }
+
+        listGroup.append(clone);
+      }
+
+      function clearRecord() {
+        listGroup.innerHTML = "";
+      }
+
+      function guessAnswer() {
+        if (answer === "") {
+          alert("請先按開始");
+          return;
+        }
+
+        const guess = input.value.trim();
+
+        if (!checkInput(guess)) {
+          input.value = "";
+          input.focus();
+          return;
+        }
+
+        const result = getAB(guess);
+
+        addRecord(result, guess);
+
+        input.value = "";
+        input.focus();
+
+        if (result === "4A0B") {
+          alert("恭喜答對，遊戲結束");
+
+          input.disabled = true;
+          btnGuess.disabled = true;
+          btnRestart.textContent = "再玩一次";
+        }
+      }
+
+      btnStart.addEventListener("click", function () {
+        if (answer != "") {
+          alert("遊戲已開始，請先完成或按「放棄重來」。");
+          return;
+        }
+
+        answer = createAnswer();
+
+        clearRecord();
+        input.value = "";
+        input.disabled = false;
+        btnGuess.disabled = false;
+
+        alert("遊戲開始，請輸入4個不重複數字");
+      });
+
+      btnGuess.addEventListener("click", guessAnswer);
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          guessAnswer();
+        }
+      });
+
+      btnRestart.addEventListener("click", function () {
+        if (answer === "") {
+          alert("目前還沒有開始遊戲");
+          return;
+        }
+        btnRestart.textContent = "放棄重玩";
+        answer = createAnswer();
+
+        clearRecord();
+        input.value = "";
+        input.disabled = false;
+        btnGuess.disabled = false;
+
+        alert("已重新開始遊戲");
+      });
+
+      btnWatchAns.addEventListener("click", function () {
+        if (answer === "") {
+          alert("請先按開始");
+          return;
+        }
+
+        alert(`答案是：${answer}`);
+      });
+    </script>
+  </body>
+</html>
